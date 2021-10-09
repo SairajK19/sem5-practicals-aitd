@@ -5,7 +5,7 @@
 #define MAX 100
 
 int calculate_average(int *, int);
-void sort_processes(int, int *, int *);
+void sort_processes(int, int *, int *, int *);
 
 int main()
 {
@@ -18,7 +18,7 @@ int main()
      * calculate the waiting time, avg wating time, turn around time, avg turn around time.
     */
 
-    int bustime[MAX], arrival_time[MAX], i, waiting_time[MAX], avg_waiting_time, turn_around_time[MAX];
+    int processes[MAX], bustime[MAX], arrival_time[MAX], i, waiting_time[MAX], avg_waiting_time, turn_around_time[MAX];
     int avg_turn_around_time, total_processes, ascii = 65, time = 0;
 
     printf("Enter the total number of processes: ");
@@ -30,14 +30,15 @@ int main()
         scanf("%d", &bustime[i]);
         printf("Enter the arrival time for process %c \n", ascii + i);
         scanf("%d", &arrival_time[i]);
+        processes[i] = i;
     }
 
-    sort_processes(total_processes, bustime, arrival_time);
+    sort_processes(total_processes, bustime, arrival_time, processes);
 
     printf("\nPrinting Gantt chart.\n");
     for (i = 0; i < total_processes; i++)
     {
-        printf("| %c ", ascii + i);
+        printf("| %c ", ascii + processes[i]);
     }
     printf("|\n");
 
@@ -60,7 +61,7 @@ int main()
     printf("\n\nWaiting time is \n");
     for (i = 0; i < total_processes; i++)
     {
-        printf("Process %c -> %d.\n", ascii + i, waiting_time[i]);
+        printf("Process %c -> %d.\n", ascii + processes[i], waiting_time[i]);
     }
 
     printf("Average waiting time is %d. \n", calculate_average(waiting_time, total_processes));
@@ -68,7 +69,7 @@ int main()
     printf("\n\nTurn around time is \n");
     for (i = 0; i < total_processes; i++)
     {
-        printf("Process %c -> %d. \n", ascii + i, bustime[i] + waiting_time[i]);
+        printf("Process %c -> %d. \n", ascii + processes[i], bustime[i] + waiting_time[i]);
         turn_around_time[i] = bustime[i] + waiting_time[i];
     }
 
@@ -93,7 +94,7 @@ void swap(int *arr, int x, int y)
     arr[y] = temp;
 }
 
-void sort_processes(int total_processes, int *bustime, int *arrival_time)
+void sort_processes(int total_processes, int *bustime, int *arrival_time, int *processes)
 {
     int i, j, temp, low = 0, high = total_processes - 1;
 
@@ -105,6 +106,7 @@ void sort_processes(int total_processes, int *bustime, int *arrival_time)
             {
                 swap(arrival_time, j + 1, j);
                 swap(bustime, j + 1, j);
+                swap(processes, j+1, j);
             }
         }
     }

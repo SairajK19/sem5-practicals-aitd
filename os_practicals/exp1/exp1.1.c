@@ -14,12 +14,12 @@ int main()
 
     if (pid == 0)
     {
-        printf("Child Process\n");
+        printf("Child Process, pid : %d\n", pid);
         exit(0);
     }
     else
     {
-        printf("Parent process\n");
+        printf("Parent process, pid : %d\n", pid);
     }
     return 0;
 }

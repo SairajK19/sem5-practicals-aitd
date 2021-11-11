@@ -1,100 +1,68 @@
-// RR
-
-// RR Pre-Emptive Algorithm.
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdbool.h>
-#define MAX 100
 
 int main()
 {
-    /*
-	p1 -> 5
-	p2 -> 10
-	p3 -> 22
-	
-	slice = 2
-	
-	p1 -> 0 2
-	p2 -> 2 4
-	p3 -> 4 6
-	
-	*/
-    int time_quantum, processes[MAX], burst_time[MAX], waiting_time[MAX], remaining_burst_time[MAX], turn_around_time[MAX];
-    int ascii = 65, total_processes, i, j, current_time = 0;
-    bool done = false;
 
-    printf("Enter the total number of processes.\n");
-    scanf("%d", &total_processes);
+    int i, total_process, q, t = 0;
+    int burst_time[10], waiting_time[10], turn_around_time[10], processes[10], remaining_burst_time[20];
 
-    printf("Enter burst time of process");
-    for (j = 0; j < total_processes; j++)
+    float awt = 0.0, att = 0.0;
+    printf("Enter the number of processes:  ");
+    scanf("%d", &total_process);
+
+    for (i = 0; i < total_process; i++)
     {
-        printf(" %c ", ascii + j);
+        printf("Enter the Process and Burst time: ");
+        scanf("%d %d", &processes[i], &burst_time[i]);
     }
-    printf(": ");
-    for (i = 0; i < total_processes; i++)
-    {
 
-        scanf("%d", &burst_time[i]);
+    printf("Enter the time slice: ");
+    scanf("%d", &q);
 
-        processes[i] = i;
+    for (i = 0; i < total_process; i++)
         remaining_burst_time[i] = burst_time[i];
-        waiting_time[i] = 0;
-    }
 
-    printf("\nEnter the time quantum: ");
-    scanf("%d", &time_quantum);
-
-    while (true)
+    while (1)
     {
-        for (i = 0; i < total_processes; i++)
+        bool done = true;
+        for (i = 0; i < total_process; i++)
         {
             if (remaining_burst_time[i] > 0)
             {
                 done = false;
-            }
-
-            if (remaining_burst_time[i] >= time_quantum)
-            {
-                remaining_burst_time[i] -= time_quantum;
-
-                for (j = 0; j < total_processes; j++)
+                if (remaining_burst_time[i] > q)
                 {
-                    if (j != i)
-                    {
-                        waiting_time[j] += time_quantum;
-                    }
+                    t = t + q;
+                    remaining_burst_time[i] = remaining_burst_time[i] - q;
                 }
-
-                current_time += time_quantum;
-            }
-
-            else if (remaining_burst_time[i] < time_quantum)
-            {
-                // direct print, dont decrement
-                remaining_burst_time[i] = 0;
-
-                current_time += time_quantum;
-            }
-
-            if (remaining_burst_time[i] <= 0)
-            {
-                done = true;
+                else
+                {
+                    t = t + remaining_burst_time[i];
+                    waiting_time[i] = t - burst_time[i];
+                    awt = awt + waiting_time[i];
+                    remaining_burst_time[i] = 0;
+                }
             }
         }
-
-        if (done)
-        {
+        if (done == true)
             break;
-        }
     }
 
-    printf("Process | Burst Time | Waiting Time | Turn Around Time \n");
-    for (i = 0; i < total_processes; i++)
+    for (i = 0; i < total_process; i++)
     {
-        printf("%c       | %d         | %d           | %d              \n", processes[i] + ascii, burst_time[i], waiting_time[i], turn_around_time[i]);
+        turn_around_time[i] = burst_time[i] + waiting_time[i];
+        att = att + turn_around_time[i];
     }
 
-    printf("\n");
+    printf("\n\tProcess\t\tBurst Time\tWaiting Time\tTurnaround Time");
+
+    for (i = 0; i < total_process; i++)
+        printf("\n\tP%d\t\t%d\t\t%d\t\t%d", processes[i], burst_time[i], waiting_time[i], turn_around_time[i]);
+
+    printf("\nAverage waiting time is %f", awt / total_process);
+    printf("\nAverage turnaround time is %f", att / total_process);
+
     return 0;
 }

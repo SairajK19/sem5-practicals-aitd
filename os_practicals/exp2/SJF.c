@@ -1,107 +1,74 @@
-//exp2.3.c SJF
 #include <stdio.h>
 
 #define MAX 100
 
-int calculate_average(int *, int);
-int sort_processes(int *, int *, int);
-void swap(int *, int, int);
-
 int main()
 {
-	/**
-	* Take processes from user.
-	* Take the bus time.
-	* sort based on burst time.
-	* print gantt chart.
-	* calculate the waiting time, avg wating time, turn around time, avg turn around time.
-	*/
-	int processes[MAX], burst_time[MAX], i, waiting_time[MAX], avg_waiting_time, turn_around_time[MAX];
-	int avg_turn_around_time, total_processes, ascii = 65, time = 0;
+    int burst_time[MAX], processes[MAX], total_processes, i, j, waiting_time[MAX] = {0}, temp = 0;
+    float average_waiting_time = 0, average_turn_around_time = 0;
 
-	printf("Enter the total number of processes: ");
-	scanf("%d", &total_processes);
+    printf("\nNumber of Processes: ");
+    scanf("%d", &total_processes);
 
-	for (i = 0; i < total_processes; i++)
-	{
-		printf("Enter the bus time of process %c \n", ascii + i);
-		scanf("%d", &burst_time[i]);
-		processes[i] = i;
-	}
+    printf("\nEnter burst time of each processes sequencially: ");
+    for (i = 0; i < total_processes; i++)
+    {
+        scanf("%d", &burst_time[i]);
+        processes[i] = i + 1;
+    }
 
-	sort_processes(processes, burst_time, total_processes);
+    processes[i] = i;
 
-	printf("\nPrinting Gantt chart.\n");
-	for (i = 0; i < total_processes; i++)
-	{
-		printf("| %c ", ascii + processes[i]);
-	}
+    for (i = 0; i < total_processes - 1; i++)
+    {
+        for (j = 0; j < total_processes - i - 1; j++)
+        {
+            if (burst_time[j] > burst_time[j + 1])
+            {
+                temp = burst_time[j];
+                burst_time[j] = burst_time[j + 1];
+                burst_time[j + 1] = temp;
 
-	printf("|\n");
+                temp = processes[j];
+                processes[j] = processes[j + 1];
+                processes[j + 1] = temp;
+            }
+        }
+    }
 
-	time = 0;
-	for (i = -1; i < total_processes; i++)
-	{
-		if (i == -1)
-		{
-			printf("%d ", 0);
-			waiting_time[i + 1] = time;
-		}
-		else
-		{
-			printf("%d ", time + burst_time[i]);
-			time = time + burst_time[i];
-			waiting_time[i + 1] = time;
-		}
-	}
-	
-	printf("\n\nWaiting time is \n");
-	
-	for (i = 0; i < total_processes; i++)
-	{
-		printf("Process %c -> %d.\n", ascii + processes[i], waiting_time[i]);
-	}
-	
-	printf("Average waiting time is %d. \n", calculate_average(waiting_time, total_processes));
-	printf("\n\nTurn around time is \n");
-	for (i = 0; i < total_processes; i++)
-	{
-		printf("Process %c -> %d. \n", ascii + processes[i], burst_time[i] + waiting_time[i]);
-		turn_around_time[i] = burst_time[i] + waiting_time[i];
-	}
-	
-	printf("Average Turn around time is %d. \n", calculate_average(turn_around_time, total_processes));
-}
+    for (i = 1; i <= total_processes; i++)
+    {
+        waiting_time[i] = waiting_time[i - 1] + burst_time[i - 1];
+    }
 
-int sort_processes(int *processes, int *burst_time, int total_processes)
-{
-	int temp, i ,j;
-	for (i = 0; i < total_processes - 1; i++)
-	{
-		for (j = 0; j < total_processes - i - 1; j++)
-		{
-			if (burst_time[j] > burst_time[j+1])
-			{
-				swap(burst_time, j+1, j);
-				swap(processes, j+1, j);
-			}		
-		}
-	}
-}
-	
-int calculate_average(int *arr, int length)
-{
-	int i, total = 0;
-	for (i = 0; i < length; i++)
-	{
-		total = total + arr[i];
-	}
-	return total / length;
-}
+    printf("\n\nWaiting time \n");
+    for (i = 0; i < total_processes; i++)
+    {
+        printf("P%d->%d\n", processes[i], waiting_time[i]);
+    }
 
-void swap(int *arr, int x, int y)
-{
-	int temp = arr[x];
-	arr[x] = arr[y];
-	arr[y] = temp;
+    for (i = 0; i < total_processes; i++)
+    {
+        average_waiting_time += waiting_time[i];
+    }
+
+    average_waiting_time /= total_processes;
+
+    printf("\n\nAverage Waiting Time is %f \n", average_waiting_time);
+
+    printf("\n\nTurn Around Time \n");
+    for (i = 0; i < total_processes; i++)
+    {
+        printf("P%d->%d\n", processes[i], waiting_time[i] + burst_time[i]);
+    }
+
+    for (i = 0; i < total_processes; i++)
+    {
+        average_turn_around_time += waiting_time[i] + burst_time[i];
+    }
+
+    average_turn_around_time /= total_processes;
+    printf("\n\nAverage Turn Around Time is %f \n\n", average_turn_around_time);
+
+    return 0;
 }

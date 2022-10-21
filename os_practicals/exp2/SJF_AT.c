@@ -1,121 +1,98 @@
 #include <stdio.h>
 
-#define MAX 100
-
-void sort_processes(int *, int *, int *, int);
-int get_shortest_process(int *, int *, int, int, int);
-
-struct process
-{
-	int burst_time;
-	int arrival_time;
-};
-
 int main()
 {
-	/**
-    * SJF with AT
-	* Take processes from user.
-	* Take the bus time.
-    * Take the arrival time
-	* print gantt chart.
-	* calculate the waiting time, avg wating time, turn around time, avg turn around time.
-	*/
-	int processes[MAX], burst_time[MAX], arrival_time[MAX], i, waiting_time[MAX], avg_waiting_time, turn_around_time[MAX];
-	int avg_turn_around_time, total_processes, ascii = 65, time = 0, process;
+	int i, j, n, min, k = 1, btime = 0, ASCII = 65;
+	float wavg = 0, tavg = 0, tsum = 0, wsum = 0;
+	int process[99], burst_time[99], temp, arrival_time[99], waiting_time[99], turn_arround_time[99], ta = 0, sum = 0;
 
-	printf("Enter the total number of processes: ");
-	scanf("%d", &total_processes);
+	printf("\nEnter the number of process:");
+	scanf("%d", &n);
 
-	for (i = 0; i < total_processes; i++)
+
+	printf("\nEnter Burst time of processes sequentially:");
+	for (i = 0; i < n; i++)
 	{
-		printf("Enter the bus time of process %c \n", ascii + i);
 		scanf("%d", &burst_time[i]);
-		printf("Enter the Arrival time of process %c \n", ascii + i);
+
+		process[i] = ASCII + i;
+	}
+
+	printf("\nEnter arrival time of processes sequentially:");
+	for (i = 0; i < n; i++)
+	{
 		scanf("%d", &arrival_time[i]);
-
-		processes[i] = i;
 	}
 
-	// Sort based on arrival time.
-	sort_processes(processes, burst_time, arrival_time, total_processes);
-	printf("After Sorting\n");
-	printf("| Processes | Burst Time | Arrival Time |\n");
-	for (i = 0; i < total_processes; i++)
+	for (i = 0; i < n; i++)
 	{
-		printf("|    %c      |     %d      |      %d       |\n", ascii + processes[i], burst_time[i], arrival_time[i]);
-	}
-
-	printf("\n\n| Processes | Burst Time | Arrival Time |\n");
-	for (i = 0; i < total_processes; i++)
-	{
-		process = get_shortest_process(arrival_time, burst_time, i, total_processes, time);
-		time = time + burst_time[process];
-		// printf("\n Process %d has shortest bustime \n", process);
-		printf("|    %c      |     %d      |      %d       |\n", ascii + processes[process], burst_time[process], arrival_time[process]);
-	}
-
-	return 0;
-}
-
-void swap(int *arr, int x, int y)
-{
-	int temp = arr[x];
-	arr[x] = arr[y];
-	arr[y] = temp;
-}
-
-void sort_processes(int *processes, int *burst_time, int *arrival_time, int total_processes)
-{
-	int i, j, temp;
-	for (i = 0; i < total_processes; i++)
-	{
-		for (j = 0; j < total_processes - i - 1; j++)
+		for (j = 0; j < n; j++)
 		{
-			if (arrival_time[j] > arrival_time[j + 1])
+			if (arrival_time[i] < arrival_time[j])
 			{
-				swap(arrival_time, j + 1, j);
-				swap(processes, j + 1, j);
-				swap(burst_time, j + 1, j);
+				temp = process[j];
+				process[j] = process[i];
+				process[i] = temp;
+
+				temp = arrival_time[j];
+				arrival_time[j] = arrival_time[i];
+				arrival_time[i] = temp;
+
+				temp = burst_time[j];
+				burst_time[j] = burst_time[i];
+				burst_time[i] = temp;
 			}
 		}
 	}
-}
 
-int get_shortest_process(int *time, int *burst_time, int current_index, int total_processes, int current_time)
-{
-	int min = 0, process = current_index;
-	int process_with_shortest_bt[MAX], counter = 0, ascii = 65;
-
-	// start iterating from the current process index.
-	// check which of the processes have arrived and store them in an array.
-	for (int i = current_index; i < total_processes; i++)
+	for (j = 0; j < n; j++)
 	{
-		if (time[i] < current_time)
+		btime = btime + burst_time[j];
+		min = burst_time[k];
+		for (i = k; i < n; i++)
 		{
-			process_with_shortest_bt[counter] = i;
-			counter++;
+			if (btime >= arrival_time[i] && burst_time[i] < min)
+			{
+				temp = process[k];
+				process[k] = process[i];
+				process[i] = temp;
+
+				temp = arrival_time[k];
+				arrival_time[k] = arrival_time[i];
+				arrival_time[i] = temp;
+
+				temp = burst_time[k];
+				burst_time[k] = burst_time[i];
+				burst_time[i] = temp;
+			}
 		}
+		k++;
 	}
-
-	printf("\n");
-	for (int i = 0; i < counter; i++)
+	waiting_time[0] = 0;
+	for (i = 1; i < n; i++)
 	{
-		printf("%d ", process_with_shortest_bt[i]);
+		sum = sum + burst_time[i - 1];
+		waiting_time[i] = sum - arrival_time[i];
+		wsum = wsum + waiting_time[i];
 	}
-	printf("\n");
 
-	// From those processes get the process
-	// which has the shortest bus time.
-	for (int i = 0; i < counter; i++)
+	wavg = (wsum / n);
+	for (i = 0; i < n; i++)
 	{
-		if (burst_time[process_with_shortest_bt[i]] < min)
-		{
-			min = process_with_shortest_bt[i];
-			process = i;
-		}
+		ta = ta + burst_time[i];
+		turn_arround_time[i] = ta - arrival_time[i];
+		tsum = tsum + turn_arround_time[i];
 	}
 
-	printf("Sending %c\n", process + ascii);
-	return process;
+	tavg = (tsum / n);
+
+	printf("\nProcess\t Burst\t Arrival\t Waiting\t Turn-around");
+	for (i = 0; i < n; i++)
+	{
+		printf("\n %c\t %d\t %d\t\t %d\t\t\t%d", process[i], burst_time[i], arrival_time[i], waiting_time[i], turn_arround_time[i]);
+	}
+
+	printf("\nAverage Waiting time: %f", wavg);
+	printf("\nAverage turn arround time : %f", tavg);
+	return 0;
 }

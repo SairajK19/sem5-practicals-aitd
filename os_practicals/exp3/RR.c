@@ -4,7 +4,6 @@
 
 int main()
 {
-
     int i, total_process, q, t = 0;
     int burst_time[10], waiting_time[10], turn_around_time[10], processes[10], remaining_burst_time[20];
 

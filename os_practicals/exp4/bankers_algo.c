@@ -4,7 +4,7 @@
 #define MAX 100
 
 bool allocation_possible();
-void carry_on_resource_request();
+void make_resource_request();
 
 int main()
 {
@@ -131,7 +131,7 @@ int main()
             printf("Enter the process number: ");
             scanf("%d", &process);
 
-            carry_on_resource_request(allocation[process], need[process], copy_available, total_resources, process);
+            make_resource_request(allocation[process], need[process], copy_available, total_resources, process);
         }
         else
         {
@@ -159,7 +159,7 @@ bool allocation_possible(int process, int *available, int need[MAX][MAX], int to
     return possible;
 }
 
-void carry_on_resource_request(int *allocation, int *need, int *available, int total_resources, int process)
+void make_resource_request(int *allocation, int *need, int *available, int total_resources, int process)
 {
     int input, request[MAX], i, count_need = -1, count_available = -1;
     printf("Enter the request for each %d resource(s) sequencially: ", total_resources);
@@ -174,23 +174,15 @@ void carry_on_resource_request(int *allocation, int *need, int *available, int t
         {
             count_need++;
         }
-        else
-        {
-            printf("\n not less (need) request[%d]=%d <= need[%d]=%d\n", i, request[i], i, need[i]);
-        }
         if (request[i] <= available[i])
         {
             count_available++;
-        }
-        else
-        {
-            printf("\n not less (available) request[%d]=%d <= avalable[%d]=%d\n", i, request[i], i, available[i]);
         }
     }
 
     if (count_need != total_resources || count_available != total_resources)
     {
-        printf("Request for process P%d cannot be granted.\n", process);
+        printf("\nRequest for process P%d cannot be granted.\n", process);
         return;
     }
     else
